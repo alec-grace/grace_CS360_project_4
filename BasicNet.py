@@ -1,3 +1,8 @@
+# File: BasicNet.py
+# Author: Alec Grace
+# Created on: 21 April 2022
+# Purpose:
+#   class to create and train neural networks for CS360 Project 4
 import torch
 import torch.nn as nn
 # import torch.nn.function as F

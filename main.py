@@ -1,3 +1,8 @@
+# File: main.py
+# Author: Alec Grace
+# Created on: 21 April 2022
+# Purpose:
+#   driver for CS360 Project 4: Handwritten Number Recognition Using PyTorch
 import torch
 from BasicNet import train_basic_net
 import math
