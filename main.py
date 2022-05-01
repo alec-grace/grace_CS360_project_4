@@ -1,6 +1,7 @@
 import torch
 from BasicNet import train_basic_net
 import math
+from time import perf_counter
 
 
 def generate_dataset(data_file):
@@ -30,27 +31,28 @@ def cross_validate(training_data_file, folds: int):
     data = generate_dataset(training_data_file)
     data = list(map(convert_example, data))
     segments = extract_folds(data, folds)
-    accuracies = []
-    for i in range(len(segments)):
-        test_data = segments.pop(0)
-        training_data = []
-        for set_list in segments:
-            for individual in set_list:
-                training_data.append(individual)
-        trained = train_basic_net(training_data)
-        correct = 0
-        for item in test_data:
-            inp, label = item
-            if trained.predict(inp) == label:
-                correct += 1
-        accuracies.append(correct / len(test_data))
-        segments.append(test_data)
-    print('Total accuracy:', sum(accuracies) / len(accuracies))
-    # for i in range(len(accuracies)):
-        # print('Test', i, ' accuracy: ', accuracies[i])
-
-
-# TODO: ask about when I should be checking the accuracy for these ^^^
+    most_accurate = [0, 0]
+    for neural_net in range(3):
+        accuracies = []
+        for i in range(len(segments)):
+            test_data = segments.pop(0)
+            training_data = []
+            for set_list in segments:
+                for individual in set_list:
+                    training_data.append(individual)
+            trained = train_basic_net(training_data, neural_net + 1)
+            correct = 0
+            for item in test_data:
+                inp, label = item
+                if trained.predict(inp) == label:
+                    correct += 1
+            accuracies.append(correct / len(test_data))
+            segments.append(test_data)
+        accuracy = sum(accuracies) / len(accuracies)
+        if accuracy > most_accurate[1]:
+            most_accurate = [neural_net + 1, accuracy]
+        print('NeuralNet' + str(neural_net + 1) + ' average accuracy of:', accuracy)
+    return most_accurate[0]
 
 
 def convert_example(ex):
@@ -58,20 +60,23 @@ def convert_example(ex):
 
 
 def main():
-    # debugging_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    # print(extract_folds(debugging_data, 2))
 
-    cross_validate('mnist_train_0_4.csv', 4)
-
-    # trained = train_basic_net(data)
-    # test = generate_dataset('mnist_train_0_4.csv')
-    # test = list(map(convert_example, test))
-    # correct = 0
-    # for ex in test:
-    #     inp, label = ex
-    #     if trained.predict(inp) == label:
-    #         correct += 1
-    # print("Accuracy:", correct / len(test))
+    start = perf_counter()
+    best_net = cross_validate('mnist_train_0_4.csv', 4)
+    final_data = generate_dataset('mnist_train_0_4.csv')
+    final_data = list(map(convert_example, final_data))
+    final_net = train_basic_net(final_data, best_net)
+    test = generate_dataset('mnist_test_0_4.csv')
+    test_data = list(map(convert_example, test))
+    correct = 0
+    for number in test_data:
+        inp, label = number
+        if final_net.predict(inp) == label:
+            correct += 1
+    end = perf_counter()
+    print('\nFinal accuracy, using NeuralNet' + str(best_net) + ': ', correct / len(test_data))
+    total = end - start
+    print('It took', total / 60, 'minutes to complete this program...\n\nYikes.')
 
 
 if __name__ == '__main__':
