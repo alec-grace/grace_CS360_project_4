@@ -30,16 +30,24 @@ def cross_validate(training_data_file, folds: int):
     data = generate_dataset(training_data_file)
     data = list(map(convert_example, data))
     segments = extract_folds(data, folds)
-    for i in range(len(segments) - 1):
+    accuracies = []
+    for i in range(len(segments)):
         test_data = segments.pop(0)
-        trained = train_basic_net(segments)
+        training_data = []
+        for set_list in segments:
+            for individual in set_list:
+                training_data.append(individual)
+        trained = train_basic_net(training_data)
         correct = 0
         for item in test_data:
             inp, label = item
             if trained.predict(inp) == label:
                 correct += 1
-        print("Test " + str(i) + " accuracy: " + str(correct / len(test_data)))
+        accuracies.append(correct / len(test_data))
         segments.append(test_data)
+    print('Total accuracy:', sum(accuracies) / len(accuracies))
+    # for i in range(len(accuracies)):
+        # print('Test', i, ' accuracy: ', accuracies[i])
 
 
 # TODO: ask about when I should be checking the accuracy for these ^^^
@@ -53,7 +61,7 @@ def main():
     # debugging_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     # print(extract_folds(debugging_data, 2))
 
-    cross_validate('mnist_train_0_4.csv', 8)
+    cross_validate('mnist_train_0_4.csv', 4)
 
     # trained = train_basic_net(data)
     # test = generate_dataset('mnist_train_0_4.csv')

@@ -54,5 +54,5 @@ def train_basic_net(examples):
             loss.backward()
             optimizer.step()
             global_loss += loss.item()
-        print(epoch, '->', global_loss)
+        # print(epoch, '->', global_loss)
     return result_net
