@@ -5,7 +5,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 
 
-# First neural net to test data, essentially unchanged from example
+# First neural net to test data, essentially unchanged from example except for the layers
 class NeuralNet1(nn.Module):
     def __init__(self):
         super(NeuralNet1, self).__init__()
@@ -31,7 +31,7 @@ class NeuralNet1(nn.Module):
         return int(label)
 
 
-# Second neural net to test data
+# Second neural net to test data, uses Leaky ReLU activation function
 class NeuralNet2(nn.Module):
     def __init__(self):
         super(NeuralNet2, self).__init__()
@@ -57,6 +57,7 @@ class NeuralNet2(nn.Module):
         return int(label)
 
 
+# Third neural net to test data, uses Dropout activation function
 class NeuralNet3(nn.Module):
     def __init__(self):
         super(NeuralNet3, self).__init__()
@@ -93,6 +94,7 @@ class BasicDataset(Dataset):
         return len(self.examples)
 
 
+# Trains a neural net, which one is specified as an argument
 def train_basic_net(examples, net: int):
     if net == 1:
         result_net = NeuralNet1()

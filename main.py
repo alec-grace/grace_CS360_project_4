@@ -4,6 +4,7 @@ import math
 from time import perf_counter
 
 
+# Function to convert a csv file with the data into usable (tensor, label) tuples
 def generate_dataset(data_file):
     test_data = []
     with open(data_file, 'r') as in_file:
@@ -16,6 +17,7 @@ def generate_dataset(data_file):
     return test_data
 
 
+# Function to separate a list of (tensor, label) tuples into a specified number of folds
 def extract_folds(data_list, folds: int):
     fold_len = math.ceil(len(data_list) / folds)
     segments = []
@@ -27,6 +29,8 @@ def extract_folds(data_list, folds: int):
     return segments
 
 
+# Function to do complete cross validation on each neural net with the given number of folds
+# Returns the number of the most accurate (on average) neural net
 def cross_validate(training_data_file, folds: int):
     data = generate_dataset(training_data_file)
     data = list(map(convert_example, data))
@@ -55,10 +59,13 @@ def cross_validate(training_data_file, folds: int):
     return most_accurate[0]
 
 
+# Function to simply convert the list of values to a tensor of values
 def convert_example(ex):
     return torch.tensor(ex[0]), ex[1]
 
 
+# Main program, tracks the time for the whole program, selects best of three neural nets against the training data,
+# and tests the best one against the test data
 def main():
 
     start = perf_counter()
